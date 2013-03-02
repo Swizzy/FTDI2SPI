@@ -15,10 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
+    <ClInclude Include="FTDI2SPI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="targetver.h">
+    <ClInclude Include="Stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FTCSPI.h">
@@ -30,41 +33,48 @@
     <ClInclude Include="wrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="XSPI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FTDI2SPI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="XNAND.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XSPI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FTDI2SPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dllmain.cpp">
+    <ClCompile Include="AssemblyInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="wrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="XSPI.cpp">
+    <ClCompile Include="XNAND.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="XNAND.cpp">
+    <ClCompile Include="XSPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="FTCSPI.lib">
+    <ResourceCompile Include="app.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="app.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="FTD2XX.lib">
       <Filter>Resource Files</Filter>
     </Library>
-    <Library Include="FTD2XX.lib">
+    <Library Include="FTCSPI.lib">
       <Filter>Resource Files</Filter>
     </Library>
   </ItemGroup>

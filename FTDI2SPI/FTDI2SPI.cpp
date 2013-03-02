@@ -1,2 +1,9 @@
+// This is the main DLL file.
+
 #include "stdafx.h"
-#include "wrapper.h"
+
+#include "FTDI2SPI.h"
+
+namespace FTDI2SPI {
+	
+}

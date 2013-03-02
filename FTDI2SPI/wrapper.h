@@ -16,7 +16,7 @@ void Wrapper_ClearOutputBuffer();
 void Wrapper_AddByteToOutputBuffer(BYTE DataByte, bool bClearOutputBuffer);
 void Wrapper_AddWriteOutBuffer(DWORD dwNumControlBitsToWrite, unsigned char pWriteControlBuffer[]);
 void Wrapper_AddReadOutBuffer(DWORD dwNumDataBitsToRead);
-void Wrapper_SendBytesToDevice();
+void Wrapper_SendbytesToDevice();
 void Wrapper_GetDataFromDevice(unsigned int dwNumBytesToRead, unsigned char ReadDataBuffer[]);
 bool Wrapper_InitDevice();
 void Wrapper_SetAnswerFast();

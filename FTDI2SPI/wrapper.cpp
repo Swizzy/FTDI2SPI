@@ -8,109 +8,109 @@ FTC_STATUS Status;
 FTH_HIGHER_OUTPUT_PINS HighPinsWriteActiveStates;
 FTC_CHIP_SELECT_PINS ChipSelectsDisableStates;
 FTH_INPUT_OUTPUT_PINS HighInputOutputPins;
-BYTE byOutputBuffer[65535];
-BYTE dwLowPinsValue = 0;
-DWORD dwNumBytesToSend = 0;
+unsigned char byOutputBuffer[65535];
+unsigned char dwLowPinsValue = 0;
+unsigned long  dwNumbytesToSend = 0;
 
 void Wrapper_ClearOutputBuffer()
 {
 	memset(byOutputBuffer, 0, 65535);
-	dwNumBytesToSend = 0;
+	dwNumbytesToSend = 0;
 }
 
-void Wrapper_AddByteToOutputBuffer(BYTE DataByte, bool bClearOutputBuffer)
+void Wrapper_AddbyteToOutputBuffer(unsigned char Databyte, bool bClearOutputBuffer)
 {
 	if(bClearOutputBuffer)
 		Wrapper_ClearOutputBuffer();
-	byOutputBuffer[dwNumBytesToSend++] = DataByte;
+	byOutputBuffer[dwNumbytesToSend++] = Databyte;
 }
 
-void Wrapper_AddWriteOutBuffer(DWORD dwNumControlBitsToWrite, unsigned char pWriteControlBuffer[])
+void Wrapper_AddWriteOutBuffer(unsigned long  dwNumControlBitsToWrite, unsigned char pWriteControlBuffer[])
 {
 	if (dwNumControlBitsToWrite <= 1)
 		return;
-	DWORD dwModNumControlBitsToWrite = dwNumControlBitsToWrite - 1;
-	DWORD dwNumControlBytes = dwModNumControlBitsToWrite / 8;
-	DWORD dwControlBufferIndex = 0;	
-	if (dwNumControlBytes > 0)
+	unsigned long  dwModNumControlBitsToWrite = dwNumControlBitsToWrite - 1;
+	unsigned long  dwNumControlbytes = dwModNumControlBitsToWrite / 8;
+	unsigned long  dwControlBufferIndex = 0;	
+	if (dwNumControlbytes > 0)
 	{
-		dwNumControlBytes = dwNumControlBytes - 1;
-		Wrapper_AddByteToOutputBuffer(CLK_DATA_BYTES_OUT_ON_NEG_CLK_LSB_FIRST_CMD, false);
-		Wrapper_AddByteToOutputBuffer(dwNumControlBytes & 0xFF, false);
-		Wrapper_AddByteToOutputBuffer((dwNumControlBytes / 256) & 0xFF, false);
+		dwNumControlbytes = dwNumControlbytes - 1;
+		Wrapper_AddbyteToOutputBuffer(CLK_DATA_BYTES_OUT_ON_NEG_CLK_LSB_FIRST_CMD, false);
+		Wrapper_AddbyteToOutputBuffer(dwNumControlbytes & 0xFF, false);
+		Wrapper_AddbyteToOutputBuffer((dwNumControlbytes / 256) & 0xFF, false);
 		do
 		{
-			Wrapper_AddByteToOutputBuffer(pWriteControlBuffer[dwControlBufferIndex], false);
+			Wrapper_AddbyteToOutputBuffer(pWriteControlBuffer[dwControlBufferIndex], false);
 			dwControlBufferIndex = (dwControlBufferIndex + 1);
 		}
-		while (dwControlBufferIndex < (dwNumControlBytes + 1));
+		while (dwControlBufferIndex < (dwNumControlbytes + 1));
 	}
-	DWORD dwNumRemainingControlBits = dwModNumControlBitsToWrite % 8;
+	unsigned long  dwNumRemainingControlBits = dwModNumControlBitsToWrite % 8;
 	if (dwNumRemainingControlBits <= 0)
 		return;
-	Wrapper_AddByteToOutputBuffer(CLK_DATA_BITS_OUT_ON_NEG_CLK_LSB_FIRST_CMD, false);
-	Wrapper_AddByteToOutputBuffer(dwNumRemainingControlBits & 0xFF, false);
-	Wrapper_AddByteToOutputBuffer(pWriteControlBuffer[dwControlBufferIndex], false);
+	Wrapper_AddbyteToOutputBuffer(CLK_DATA_BITS_OUT_ON_NEG_CLK_LSB_FIRST_CMD, false);
+	Wrapper_AddbyteToOutputBuffer(dwNumRemainingControlBits & 0xFF, false);
+	Wrapper_AddbyteToOutputBuffer(pWriteControlBuffer[dwControlBufferIndex], false);
 }
 
-void Wrapper_AddReadOutBuffer(DWORD dwNumDataBitsToRead)
+void Wrapper_AddReadOutBuffer(unsigned long  dwNumDataBitsToRead)
 {
-	DWORD dwModNumBitsToRead = dwNumDataBitsToRead - 1;
-	DWORD dwNumDataBytes = dwModNumBitsToRead / 8;
-	if (dwNumDataBytes > 0)
+	unsigned long  dwModNumBitsToRead = dwNumDataBitsToRead - 1;
+	unsigned long  dwNumDatabytes = dwModNumBitsToRead / 8;
+	if (dwNumDatabytes > 0)
 	{
-		Wrapper_AddByteToOutputBuffer(CLK_DATA_BYTES_IN_ON_NEG_CLK_LSB_FIRST_CMD, false);
-		Wrapper_AddByteToOutputBuffer((dwNumDataBytes & 0xFF), false);
-		Wrapper_AddByteToOutputBuffer(((dwNumDataBytes / 256) & 0xFF), false);
+		Wrapper_AddbyteToOutputBuffer(CLK_DATA_BYTES_IN_ON_NEG_CLK_LSB_FIRST_CMD, false);
+		Wrapper_AddbyteToOutputBuffer((dwNumDatabytes & 0xFF), false);
+		Wrapper_AddbyteToOutputBuffer(((dwNumDatabytes / 256) & 0xFF), false);
 	}
-	DWORD dwNumRemainingDataBits = dwModNumBitsToRead % 8;
+	unsigned long  dwNumRemainingDataBits = dwModNumBitsToRead % 8;
 	if (dwNumRemainingDataBits <= 0)
 		return;
-	Wrapper_AddByteToOutputBuffer(CLK_DATA_BITS_IN_ON_NEG_CLK_LSB_FIRST_CMD, false);
-	Wrapper_AddByteToOutputBuffer(dwNumRemainingDataBits & 0xFF, false);
+	Wrapper_AddbyteToOutputBuffer(CLK_DATA_BITS_IN_ON_NEG_CLK_LSB_FIRST_CMD, false);
+	Wrapper_AddbyteToOutputBuffer(dwNumRemainingDataBits & 0xFF, false);
 }
 
-void Wrapper_SendBytesToDevice()
+void Wrapper_SendbytesToDevice()
 {
 	Status = FTC_SUCCESS;
-	DWORD dwNumBytesSent = 0;
-	DWORD dwTotalNumBytesSent = 0;
-	if (dwNumBytesToSend > MAX_NUM_BYTES_USB_WRITE)
+	unsigned long  dwNumbytesSent = 0;
+	unsigned long  dwTotalNumbytesSent = 0;
+	if (dwNumbytesToSend > MAX_NUM_BYTES_USB_WRITE)
 	{
-		DWORD dwNumDataBytesToSend = 0;
+		unsigned long  dwNumDatabytesToSend = 0;
 		do
 		{
-			if ((dwTotalNumBytesSent + MAX_NUM_BYTES_USB_WRITE) <= dwNumBytesToSend)
-				dwNumDataBytesToSend = MAX_NUM_BYTES_USB_WRITE;
+			if ((dwTotalNumbytesSent + MAX_NUM_BYTES_USB_WRITE) <= dwNumbytesToSend)
+				dwNumDatabytesToSend = MAX_NUM_BYTES_USB_WRITE;
 			else
-				dwNumDataBytesToSend = (dwNumBytesToSend - dwTotalNumBytesSent);
-			Status = FT_Write((FT_HANDLE)ftHandle, &byOutputBuffer[dwTotalNumBytesSent], dwNumDataBytesToSend, &dwNumBytesSent);
-			dwTotalNumBytesSent = dwTotalNumBytesSent + dwNumBytesSent;
+				dwNumDatabytesToSend = (dwNumbytesToSend - dwTotalNumbytesSent);
+			Status = FT_Write((FT_HANDLE)ftHandle, &byOutputBuffer[dwTotalNumbytesSent], dwNumDatabytesToSend, &dwNumbytesSent);
+			dwTotalNumbytesSent = dwTotalNumbytesSent + dwNumbytesSent;
 		}
-		while ((dwTotalNumBytesSent < dwNumBytesToSend) && (Status == FTC_SUCCESS)); 
+		while ((dwTotalNumbytesSent < dwNumbytesToSend) && (Status == FTC_SUCCESS)); 
 	}
 	else
-		Status = FT_Write((FT_HANDLE)ftHandle, byOutputBuffer, dwNumBytesToSend, &dwNumBytesSent);
+		Status = FT_Write((FT_HANDLE)ftHandle, byOutputBuffer, dwNumbytesToSend, &dwNumbytesSent);
 	Wrapper_ClearOutputBuffer();
 }
 
-void Wrapper_GetDataFromDevice(unsigned int dwNumBytesToRead, unsigned char ReadDataBuffer[])
+void Wrapper_GetDataFromDevice(unsigned int dwNumbytesToRead, unsigned char ReadDataBuffer[])
 {
-	DWORD dwNumBytesRead = 0;
-	DWORD dwBytesReadIndex = 0;
+	unsigned long  dwNumbytesRead = 0;
+	unsigned long  dwbytesReadIndex = 0;
 	int try_count = 10;	
 	do {
-		FT_Read((FT_HANDLE)ftHandle, &ReadDataBuffer[dwBytesReadIndex], dwNumBytesToRead, &dwNumBytesRead);
-		dwBytesReadIndex += dwNumBytesRead;
-		dwNumBytesToRead -= dwNumBytesRead;
-	} while( dwNumBytesToRead > 0 && try_count-- > 0 );
+		FT_Read((FT_HANDLE)ftHandle, &ReadDataBuffer[dwbytesReadIndex], dwNumbytesToRead, &dwNumbytesRead);
+		dwbytesReadIndex += dwNumbytesRead;
+		dwNumbytesToRead -= dwNumbytesRead;
+	} while( dwNumbytesToRead > 0 && try_count-- > 0 );
 	if( try_count <= 0 )
 		throw "ERROR: NO DATA FROM DEVICE";	
 }
 
 bool Wrapper_InitDevice()
 {
-	DWORD dwNumHiSpeedDevices = 0, dwLocationID = 0, dwHiSpeedDeviceType = 0, dwClockFrequencyHz = 0;
+	unsigned long  dwNumHiSpeedDevices = 0, dwLocationID = 0, dwHiSpeedDeviceType = 0, dwClockFrequencyHz = 0;
 	BYTE timerValue = 0;
 	char szDeviceName[100];
 	char szChannel[5];
@@ -120,7 +120,7 @@ bool Wrapper_InitDevice()
 	Status = SPI_GetNumHiSpeedDevices(&dwNumHiSpeedDevices);
 	if ((Status == FTC_SUCCESS) && (dwNumHiSpeedDevices > 0))
 	{
-		DWORD dwHiSpeedDeviceIndex = 0;
+		unsigned long  dwHiSpeedDeviceIndex = 0;
 		do
 		{
 			Status = SPI_GetHiSpeedDeviceNameLocIDChannel(dwHiSpeedDeviceIndex, szDeviceName, 100, &dwLocationID, szChannel, 5, &dwHiSpeedDeviceType);
@@ -227,47 +227,47 @@ bool Wrapper_InitDevice()
 
 void Wrapper_SetAnswerFast()
 {
-	Wrapper_AddByteToOutputBuffer(SEND_ANSWER_BACK_IMMEDIATELY_CMD, false);	
+	Wrapper_AddbyteToOutputBuffer(SEND_ANSWER_BACK_IMMEDIATELY_CMD, false);	
 }
 
 void Wrapper_DisableSPIChip()
 {
-	Wrapper_AddByteToOutputBuffer(SET_LOW_BYTE_DATA_BITS_CMD, false);
+	Wrapper_AddbyteToOutputBuffer(SET_LOW_BYTE_DATA_BITS_CMD, false);
 	dwLowPinsValue |= CHIP_SELECT_PIN;
-	Wrapper_AddByteToOutputBuffer(dwLowPinsValue, false);
-	Wrapper_AddByteToOutputBuffer(0xFB, false);
+	Wrapper_AddbyteToOutputBuffer(dwLowPinsValue, false);
+	Wrapper_AddbyteToOutputBuffer(0xFB, false);
 }
 
 void Wrapper_EnableSpiChip()
 {
-	Wrapper_AddByteToOutputBuffer(SET_LOW_BYTE_DATA_BITS_CMD, false);
+	Wrapper_AddbyteToOutputBuffer(SET_LOW_BYTE_DATA_BITS_CMD, false);
 	dwLowPinsValue &= ~CHIP_SELECT_PIN;
-	Wrapper_AddByteToOutputBuffer(dwLowPinsValue, false);
-	Wrapper_AddByteToOutputBuffer(0xFB, false);
+	Wrapper_AddbyteToOutputBuffer(dwLowPinsValue, false);
+	Wrapper_AddbyteToOutputBuffer(0xFB, false);
 }
 
 void Wrapper_SetCS(bool ChipSelect)
 {
 	Wrapper_ClearOutputBuffer();
-	DWORD dwNumBytesSent = 0;
-	byOutputBuffer[dwNumBytesToSend++] = 0x80;
+	unsigned long  dwNumbytesSent = 0;
+	byOutputBuffer[dwNumbytesToSend++] = 0x80;
 	dwLowPinsValue &= ~0x08;
 	dwLowPinsValue |= ChipSelect ? 0x08 : 0x00;
-	byOutputBuffer[dwNumBytesToSend++] = dwLowPinsValue;
-	byOutputBuffer[dwNumBytesToSend++] = 0x3E;
-	FT_STATUS ftStatus = FT_Write( (FT_HANDLE)ftHandle, byOutputBuffer, dwNumBytesToSend, &dwNumBytesSent);
+	byOutputBuffer[dwNumbytesToSend++] = dwLowPinsValue;
+	byOutputBuffer[dwNumbytesToSend++] = 0x3E;
+	FT_STATUS ftStatus = FT_Write( (FT_HANDLE)ftHandle, byOutputBuffer, dwNumbytesToSend, &dwNumbytesSent);
 	Wrapper_ClearOutputBuffer();
 }
 
 void Wrapper_SetGPIO(bool xxLO, bool ejLO)
 {
 	Wrapper_ClearOutputBuffer();
-	DWORD dwNumBytesSent = 0;
-	byOutputBuffer[dwNumBytesToSend++] = 0x80;
+	unsigned long  dwNumbytesSent = 0;
+	byOutputBuffer[dwNumbytesToSend++] = 0x80;
 	dwLowPinsValue &= ~0x30;
 	dwLowPinsValue |= (xxLO ? 0x10 : 0x00) | (ejLO ? 0x20 : 0x00);
-	byOutputBuffer[dwNumBytesToSend++] = dwLowPinsValue; 
-	byOutputBuffer[dwNumBytesToSend++] = 0x3E;
-	FT_STATUS ftStatus = FT_Write( (FT_HANDLE)ftHandle, byOutputBuffer, dwNumBytesToSend, &dwNumBytesSent);
+	byOutputBuffer[dwNumbytesToSend++] = dwLowPinsValue; 
+	byOutputBuffer[dwNumbytesToSend++] = 0x3E;
+	FT_STATUS ftStatus = FT_Write( (FT_HANDLE)ftHandle, byOutputBuffer, dwNumbytesToSend, &dwNumbytesSent);
 	Wrapper_ClearOutputBuffer();
 }
